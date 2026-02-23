@@ -215,9 +215,11 @@ export default function ProductCheckoutPage() {
                 method={selectedPayment} 
                 totalAmount={selectedNominal?.price || 0} 
               />
-              {selectedPayment.type === 'transfer' && (
-                <PaymentProofUpload onUpload={(file) => setPaymentProof(file)} />
-              )}
+              <PaymentProofUpload
+                onUpload={(file) => setPaymentProof(file)}
+                selectedPayment={selectedPayment}
+                totalAmount={selectedNominal?.price}
+              />
             </>
           )}
 

@@ -237,9 +237,11 @@ export default function AccountDetailPage() {
               {selectedPayment && (
                 <>
                   <PaymentInstructions method={selectedPayment} totalAmount={account.price} />
-                  {selectedPayment.type === 'transfer' && (
-                    <PaymentProofUpload onUpload={(file) => setPaymentProof(file)} />
-                  )}
+                  <PaymentProofUpload
+                    onUpload={(file) => setPaymentProof(file)}
+                    selectedPayment={selectedPayment}
+                    totalAmount={account.price}
+                  />
                 </>
               )}
 
