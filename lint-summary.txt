@@ -1,0 +1,143 @@
+D:\robux ml\next-app\scripts\run_migration.ts
+  Line 5: 'supabase' is assigned a value but never used. (@typescript-eslint/no-unused-vars)
+  Line 12: 'sqlString' is assigned a value but never used. (@typescript-eslint/no-unused-vars)
+D:\robux ml\next-app\scripts\seed.ts
+  Line 320: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+D:\robux ml\next-app\src\app\accounts\[id]\page.tsx
+  Line 37: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 89: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 127: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+  Line 158: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+D:\robux ml\next-app\src\app\accounts\page.tsx
+  Line 84: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+D:\robux ml\next-app\src\app\api\order\route.ts
+  Line 197: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+D:\robux ml\next-app\src\app\cek-pesanan\page.tsx
+  Line 8: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 37: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+D:\robux ml\next-app\src\app\kuru\accounts\page.tsx
+  Line 50: Error: Cannot access variable before it is declared
+
+`fetchAccounts` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+D:\robux ml\next-app\src\app\kuru\accounts\page.tsx:50:5
+  48 |
+  49 |   useEffect(() => {
+> 50 |     fetchAccounts();
+     |     ^^^^^^^^^^^^^ `fetchAccounts` accessed before it is declared
+  51 |   }, []);
+  52 |
+  53 |   async function fetchAccounts() {
+
+D:\robux ml\next-app\src\app\kuru\accounts\page.tsx:53:3
+  51 |   }, []);
+  52 |
+> 53 |   async function fetchAccounts() {
+     |   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 54 |     const { data, error } = await supabase
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 55 |       .from('mlbb_accounts')
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 56 |       .select('*')
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 57 |       .order('created_at', { ascending: false });
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 58 |     if (error) toast.error(error.message);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 59 |     else setAccounts(data || []);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 60 |     setIsLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 61 |   }
+     | ^^^^ `fetchAccounts` is declared here
+  62 |
+  63 |   const openModal = (account?: MlbbAccount) => {
+  64 |     if (account) { (react-hooks/immutability)
+  Line 212: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+  Line 330: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+  Line 346: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+D:\robux ml\next-app\src\app\kuru\banners\page.tsx
+  Line 47: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 99: 'uploadData' is assigned a value but never used. (@typescript-eslint/no-unused-vars)
+  Line 114: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 160: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 185: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 199: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+D:\robux ml\next-app\src\app\kuru\categories\page.tsx
+  Line 8: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 25: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 33: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 59: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 73: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 107: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`. (react/no-unescaped-entities)
+  Line 107: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`. (react/no-unescaped-entities)
+D:\robux ml\next-app\src\app\kuru\orders\page.tsx
+  Line 4: 'Search' is defined but never used. (@typescript-eslint/no-unused-vars)
+  Line 4: 'Filter' is defined but never used. (@typescript-eslint/no-unused-vars)
+  Line 4: 'CheckCircle' is defined but never used. (@typescript-eslint/no-unused-vars)
+  Line 7: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 46: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 194: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+D:\robux ml\next-app\src\app\kuru\page.tsx
+  Line 6: 'CheckCircle2' is defined but never used. (@typescript-eslint/no-unused-vars)
+  Line 6: 'XCircle' is defined but never used. (@typescript-eslint/no-unused-vars)
+  Line 7: 'Eye' is defined but never used. (@typescript-eslint/no-unused-vars)
+  Line 21: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+D:\robux ml\next-app\src\app\kuru\payment-methods\page.tsx
+  Line 113: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 134: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 150: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 161: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 194: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`. (react/no-unescaped-entities)
+  Line 194: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`. (react/no-unescaped-entities)
+  Line 234: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+  Line 404: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+D:\robux ml\next-app\src\app\kuru\products\page.tsx
+  Line 4: 'Power' is defined but never used. (@typescript-eslint/no-unused-vars)
+  Line 4: 'PowerOff' is defined but never used. (@typescript-eslint/no-unused-vars)
+  Line 9: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 10: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 43: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 51: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 125: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 139: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 152: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 186: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`. (react/no-unescaped-entities)
+  Line 186: `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`. (react/no-unescaped-entities)
+  Line 363: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+D:\robux ml\next-app\src\app\leaderboard\page.tsx
+  Line 2: 'Image' is defined but never used. (@typescript-eslint/no-unused-vars)
+  Line 39: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+  Line 50: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+  Line 61: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+  Line 93: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+D:\robux ml\next-app\src\app\page.tsx
+  Line 12: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 39: 'sortedData' is never reassigned. Use 'const' instead. (prefer-const)
+D:\robux ml\next-app\src\app\pln\page.tsx
+  Line 12: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+D:\robux ml\next-app\src\app\product\[id]\page.tsx
+  Line 29: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 31: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 111: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 149: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+  Line 154: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+  Line 170: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+D:\robux ml\next-app\src\app\pulsa-data\page.tsx
+  Line 12: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+D:\robux ml\next-app\src\app\voucher\page.tsx
+  Line 12: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+D:\robux ml\next-app\src\components\admin\AdminSidebar.tsx
+  Line 29: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+  Line 56: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+D:\robux ml\next-app\src\components\layout\Footer.tsx
+  Line 12: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+D:\robux ml\next-app\src\components\layout\Header.tsx
+  Line 12: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+D:\robux ml\next-app\src\components\ui\AccountInput.tsx
+  Line 8: Unexpected any. Specify a different type. (@typescript-eslint/no-explicit-any)
+  Line 20: React Hook useEffect has a missing dependency: 'onChange'. Either include it or remove the dependency array. If 'onChange' changes too often, find the parent component that defines it and wrap that definition in useCallback. (react-hooks/exhaustive-deps)
+D:\robux ml\next-app\src\components\ui\PaymentInstructions.tsx
+  Line 72: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
+D:\robux ml\next-app\src\components\ui\PaymentProofUpload.tsx
+  Line 119: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element (@next/next/no-img-element)
