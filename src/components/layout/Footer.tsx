@@ -8,12 +8,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-5 gap-x-8 gap-y-12 mb-12">
           {/* Brand Info */}
           <div className="md:col-span-2 xl:pr-12">
-            <div className="flex items-center gap-3 mb-6">
-              <img src="/logo_no_background.png" alt="Lapak Robux" className="w-14 h-14 object-contain drop-shadow-[0_0_15px_rgba(255,215,0,0.4)]" />
-              <div className="flex flex-col">
-                <h2 className="text-2xl font-black text-white leading-none tracking-tight">LAPAK ROBUX</h2>
-                <span className="text-[10px] text-primary font-bold tracking-[0.2em] uppercase mt-1">Sultan Gaming Store</span>
-              </div>
+            <div className="mb-6">
+              <img src="/logo-lapak-robux.png" alt="Lapak Robux" className="h-16 sm:h-20 w-auto object-contain drop-shadow-[0_0_15px_rgba(255,215,0,0.4)]" />
             </div>
             <p className="text-white/50 text-sm mb-8 leading-relaxed max-w-sm">
               Platform top up game termurah, tercepat, dan terpercaya se-Indonesia. Penuhi kebutuhan gaming Anda dalam hitungan detik dengan proses otomatis.

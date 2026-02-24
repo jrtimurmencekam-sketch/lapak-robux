@@ -7,12 +7,8 @@ export default function Header() {
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2">
-            {/* Using a simple styled text for the logo for now */}
-            <img src="/logo_no_background.png" alt="Lapak Robux" className="w-10 h-10 object-contain drop-shadow-[0_0_8px_rgba(255,215,0,0.5)]" />
-            <span className="text-xl font-bold tracking-tight text-white hidden sm:block">
-              LAPAK ROBUX
-            </span>
+          <Link href="/" className="flex items-center">
+            <img src="/logo-lapak-robux.png" alt="Lapak Robux" className="h-10 sm:h-12 w-auto object-contain drop-shadow-[0_0_10px_rgba(255,215,0,0.4)]" />
           </Link>
         </div>
 
