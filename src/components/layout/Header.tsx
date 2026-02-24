@@ -8,7 +8,7 @@ export default function Header() {
         {/* Logo */}
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center">
-            <img src="/logo-lapak-robux.png" alt="Lapak Robux" className="h-10 sm:h-12 w-auto object-contain drop-shadow-[0_0_10px_rgba(255,215,0,0.4)]" />
+            <img src="/logo-lapak-robux.png" alt="Lapak Robux" className="h-12 sm:h-14 w-auto object-contain" />
           </Link>
         </div>
 

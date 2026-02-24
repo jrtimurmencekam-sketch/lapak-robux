@@ -9,7 +9,7 @@ export default function Footer() {
           {/* Brand Info */}
           <div className="md:col-span-2 xl:pr-12">
             <div className="mb-6">
-              <img src="/logo-lapak-robux.png" alt="Lapak Robux" className="h-16 sm:h-20 w-auto object-contain drop-shadow-[0_0_15px_rgba(255,215,0,0.4)]" />
+              <img src="/logo-lapak-robux.png" alt="Lapak Robux" className="h-20 sm:h-24 w-auto object-contain" />
             </div>
             <p className="text-white/50 text-sm mb-8 leading-relaxed max-w-sm">
               Platform top up game termurah, tercepat, dan terpercaya se-Indonesia. Penuhi kebutuhan gaming Anda dalam hitungan detik dengan proses otomatis.
