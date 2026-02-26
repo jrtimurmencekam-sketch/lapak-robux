@@ -1,16 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Smartphone, Zap, Ticket, MessageCircle, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
+import { MessageCircle, AlertCircle, CheckCircle2, Loader2, UserCheck } from 'lucide-react';
 
 interface AccountInputProps {
   gameIdType?: string;
   onChange: (data: any) => void;
 }
 
-// ══════════════════════════════════════════════════
-// Validation rules per game / service type
-// ══════════════════════════════════════════════════
 interface ValidationRule {
   pattern: RegExp;
   minLength: number;
@@ -88,24 +85,6 @@ const validationRules: Record<string, Record<string, ValidationRule>> = {
       hint: 'Contoh: ProGamer_123 (username Roblox Anda)',
     },
   },
-  phone: {
-    phoneNumber: {
-      pattern: /^08\d+$/,
-      minLength: 10,
-      maxLength: 15,
-      errorMessage: 'Nomor HP harus diawali 08 dan 10-15 digit',
-      hint: 'Contoh: 081234567890',
-    },
-  },
-  pln: {
-    meterId: {
-      pattern: /^\d+$/,
-      minLength: 10,
-      maxLength: 13,
-      errorMessage: 'ID Pelanggan harus 10-13 digit angka',
-      hint: 'Contoh: 1234567890 (cek di meteran atau struk PLN)',
-    },
-  },
 };
 
 const whatsappRule: ValidationRule = {
@@ -116,12 +95,9 @@ const whatsappRule: ValidationRule = {
   hint: 'Contoh: 081234567890',
 };
 
-// ══════════════════════════════════════════════════
-// Validate single field
-// ══════════════════════════════════════════════════
 function validateField(value: string, rule: ValidationRule): { valid: boolean; message: string } {
   if (!value || value.trim() === '') {
-    return { valid: false, message: '' }; // empty = no error shown yet
+    return { valid: false, message: '' };
   }
   if (!rule.pattern.test(value)) {
     return { valid: false, message: rule.errorMessage };
@@ -132,9 +108,6 @@ function validateField(value: string, rule: ValidationRule): { valid: boolean; m
   return { valid: true, message: '' };
 }
 
-// ══════════════════════════════════════════════════
-// Validation indicator component
-// ══════════════════════════════════════════════════
 function FieldStatus({ value, rule }: { value: string; rule: ValidationRule }) {
   if (!value) return <p className="text-xs text-white/40 mt-2">{rule.hint}</p>;
   const result = validateField(value, rule);
@@ -164,14 +137,9 @@ function getInputClass(value: string, rule: ValidationRule) {
 
 export default function AccountInput({ gameIdType = 'ID & Server', onChange }: AccountInputProps) {
   const [fields, setFields] = useState<Record<string, string>>({});
-
-  // Auto-set voucher data on mount
-  useEffect(() => {
-    if (gameIdType === 'voucher') {
-      onChange({ voucherOrder: true });
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameIdType]);
+  const [nickname, setNickname] = useState<string | null>(null);
+  const [nicknameLoading, setNicknameLoading] = useState(false);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const updateField = (key: string, value: string) => {
     setFields(prev => ({ ...prev, [key]: value }));
@@ -180,62 +148,55 @@ export default function AccountInput({ gameIdType = 'ID & Server', onChange }: A
 
   const rules = validationRules[gameIdType] || {};
 
+  // ══════════════════════════════════════════════════
+  // Auto-check nickname for ML games
+  // ══════════════════════════════════════════════════
+  useEffect(() => {
+    if (gameIdType !== 'ml' && gameIdType !== 'ID & Server') return;
+
+    const userId = fields.userId || '';
+    const zoneId = fields.zoneId || '';
+    const userRule = rules.userId;
+    const zoneRule = rules.zoneId;
+
+    // Only check when both are valid
+    if (!userRule || !zoneRule) return;
+    const userValid = validateField(userId, userRule).valid;
+    const zoneValid = validateField(zoneId, zoneRule).valid;
+
+    if (!userValid || !zoneValid) {
+      setNickname(null);
+      return;
+    }
+
+    // Debounce 500ms
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      setNicknameLoading(true);
+      setNickname(null);
+      try {
+        const res = await fetch(`/api/check-nickname?id=${userId}&zone=${zoneId}`);
+        const data = await res.json();
+        if (data.success && data.nickname) {
+          setNickname(data.nickname);
+          onChange({ nickname: data.nickname });
+        } else {
+          setNickname(null);
+        }
+      } catch {
+        setNickname(null);
+      } finally {
+        setNicknameLoading(false);
+      }
+    }, 500);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fields.userId, fields.zoneId, gameIdType]);
+
   const renderInputFields = () => {
-    // ── Phone ──
-    if (gameIdType === 'phone') {
-      const rule = rules.phoneNumber;
-      return (
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-white/70 mb-2 flex items-center gap-2">
-            <Smartphone className="w-4 h-4 text-primary" /> Nomor HP
-          </label>
-          <input 
-            type="tel" 
-            placeholder="08123456789"
-            maxLength={rule?.maxLength || 15}
-            className={rule ? getInputClass(fields.phoneNumber || '', rule) : inputClass}
-            onChange={(e) => updateField('phoneNumber', e.target.value)}
-          />
-          {rule && <FieldStatus value={fields.phoneNumber || ''} rule={rule} />}
-        </div>
-      );
-    }
-
-    // ── PLN ──
-    if (gameIdType === 'pln') {
-      const rule = rules.meterId;
-      return (
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-white/70 mb-2 flex items-center gap-2">
-            <Zap className="w-4 h-4 text-yellow-400" /> ID Pelanggan / Nomor Meter
-          </label>
-          <input 
-            type="text" 
-            placeholder="1234567890"
-            maxLength={rule?.maxLength || 20}
-            className={rule ? getInputClass(fields.meterId || '', rule) : inputClass}
-            onChange={(e) => updateField('meterId', e.target.value)}
-          />
-          {rule && <FieldStatus value={fields.meterId || ''} rule={rule} />}
-        </div>
-      );
-    }
-
-    // ── Voucher ──
-    if (gameIdType === 'voucher') {
-      return (
-        <div className="md:col-span-2">
-          <div className="flex items-center gap-3 p-4 bg-primary/10 border border-primary/20 rounded-xl">
-            <Ticket className="w-6 h-6 text-primary shrink-0" />
-            <div>
-              <p className="text-sm font-semibold text-white">Tidak perlu input data akun</p>
-              <p className="text-xs text-white/50 mt-1">Kode voucher akan dikirimkan via WhatsApp setelah pembayaran dikonfirmasi oleh Admin.</p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
     // ── ML / ID & Server ──
     if (gameIdType === 'ml' || gameIdType === 'ID & Server') {
       const userRule = rules.userId;
@@ -264,6 +225,31 @@ export default function AccountInput({ gameIdType = 'ID & Server', onChange }: A
             />
             {zoneRule && <FieldStatus value={fields.zoneId || ''} rule={zoneRule} />}
           </div>
+
+          {/* Nickname result */}
+          {(nicknameLoading || nickname) && (
+            <div className="md:col-span-2">
+              <div className={`flex items-center gap-3 p-3 rounded-xl border ${
+                nickname 
+                  ? 'bg-green-500/10 border-green-500/20' 
+                  : 'bg-white/5 border-white/10'
+              }`}>
+                {nicknameLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                    <span className="text-sm text-white/60">Mengecek nickname...</span>
+                  </>
+                ) : nickname ? (
+                  <>
+                    <UserCheck className="w-4 h-4 text-green-400" />
+                    <span className="text-sm text-white">
+                      Nickname: <span className="font-bold text-green-400">{nickname}</span>
+                    </span>
+                  </>
+                ) : null}
+              </div>
+            </div>
+          )}
         </>
       );
     }
@@ -300,18 +286,11 @@ export default function AccountInput({ gameIdType = 'ID & Server', onChange }: A
     );
   };
 
-  const getHeaderLabel = () => {
-    if (gameIdType === 'phone') return 'Masukkan Nomor HP';
-    if (gameIdType === 'pln') return 'Masukkan Data Pelanggan';
-    if (gameIdType === 'voucher') return 'Informasi Pengiriman';
-    return 'Masukkan Data Akun';
-  };
-
   return (
     <div className="bg-accent/30 border border-white/10 rounded-2xl p-6 shadow-xl">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">1</div>
-        <h2 className="text-xl font-bold text-white">{getHeaderLabel()}</h2>
+        <h2 className="text-xl font-bold text-white">Masukkan Data Akun</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

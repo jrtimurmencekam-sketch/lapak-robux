@@ -1,12 +1,9 @@
 import Link from 'next/link';
-import { Gamepad2, CreditCard, Ticket, Smartphone, ShieldCheck } from 'lucide-react';
+import { Gamepad2, ShieldCheck } from 'lucide-react';
 
 export default function CategoryNav() {
   const categories = [
     { name: 'Top Up Game', icon: <Gamepad2 className="w-5 h-5 mb-1 text-primary" />, href: '/#games' },
-    { name: 'Voucher', icon: <Ticket className="w-5 h-5 mb-1 text-white/70" />, href: '/voucher' },
-    { name: 'Pulsa & Data', icon: <Smartphone className="w-5 h-5 mb-1 text-white/70" />, href: '/pulsa-data' },
-    { name: 'Tagihan PLN', icon: <CreditCard className="w-5 h-5 mb-1 text-white/70" />, href: '/pln' },
     { name: 'Beli Akun', icon: <ShieldCheck className="w-5 h-5 mb-1 text-white/70" />, href: '/accounts' },
   ];
 

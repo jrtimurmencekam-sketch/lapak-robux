@@ -1,12 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import AccountInput from '@/components/ui/AccountInput';
 import NominalSelection from '@/components/ui/NominalSelection';
 import PaymentSelection from '@/components/ui/PaymentSelection';
-import PaymentProofUpload from '@/components/ui/PaymentProofUpload';
-import PaymentInstructions from '@/components/ui/PaymentInstructions';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
 import { Star, Headphones } from 'lucide-react';
@@ -23,6 +21,7 @@ interface ProductData {
 
 export default function ProductCheckoutPage() {
   const params = useParams();
+  const router = useRouter();
   const slug = params?.id as string;
 
   const [product, setProduct] = useState<ProductData | null>(null);
@@ -30,7 +29,6 @@ export default function ProductCheckoutPage() {
   const [accountData, setAccountData] = useState<any>({});
   const [selectedNominal, setSelectedNominal] = useState<{ id: string, price: number } | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<any | null>(null);
-  const [paymentProof, setPaymentProof] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Fetch product from Supabase
@@ -45,7 +43,6 @@ export default function ProductCheckoutPage() {
 
         if (error) throw error;
 
-        // Parse nominals if it's a string
         const nominals = typeof data.nominals === 'string' 
           ? JSON.parse(data.nominals) 
           : data.nominals || [];
@@ -67,13 +64,10 @@ export default function ProductCheckoutPage() {
 
   const handleSubmit = async () => {
     if (!product) return;
-    if (!accountData || (Object.keys(accountData).length === 0 && product.game_id_type !== 'voucher')) return toast.error('Silakan isi data akun');
+    if (!accountData || Object.keys(accountData).length === 0) return toast.error('Silakan isi data akun');
     if (!accountData.whatsapp) return toast.error('Nomor WhatsApp wajib diisi');
     if (!selectedNominal) return toast.error('Silakan pilih nominal top up');
     if (!selectedPayment) return toast.error('Silakan pilih metode pembayaran');
-
-    const isManualBank = ['bca', 'mandiri'].includes(selectedPayment);
-    if (isManualBank && !paymentProof) return toast.error('Upload bukti transfer wajib untuk Bank Manual');
 
     setIsLoading(true);
     const loadingToast = toast.loading('Memproses pesanan...');
@@ -81,24 +75,21 @@ export default function ProductCheckoutPage() {
     try {
       const nominalData = product.nominals.find(n => n.id === selectedNominal.id);
 
-      const formPayload = new FormData();
-      formPayload.append('gameTitle', product.title);
-      formPayload.append('accountData', JSON.stringify(accountData));
-      formPayload.append('nominalName', nominalData?.name || '-');
-      formPayload.append('totalAmount', selectedNominal.price.toString());
-      formPayload.append('paymentMethod', selectedPayment.label);
-
-      // Determine order type for Telegram formatting
-      const typeMap: Record<string, string> = { 'phone': 'phone', 'pln': 'pln', 'voucher': 'voucher' };
-      formPayload.append('orderType', typeMap[product.game_id_type] || 'game');
-      
-      if (paymentProof) {
-        formPayload.append('paymentProof', paymentProof);
-      }
-
+      // Send JSON (no proof upload here)
       const res = await fetch('/api/order', {
         method: 'POST',
-        body: formPayload,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          gameTitle: product.title,
+          accountData: accountData,
+          nominalName: nominalData?.name || '-',
+          totalAmount: selectedNominal.price,
+          paymentMethod: selectedPayment.label,
+          paymentMethodId: selectedPayment.id,
+          productSlug: product.slug,
+          nickname: accountData.nickname || null,
+          orderType: product.game_id_type === 'account' ? 'account' : 'game',
+        }),
       });
 
       const result = await res.json();
@@ -107,7 +98,10 @@ export default function ProductCheckoutPage() {
         throw new Error(result.message || 'Gagal memproses pesanan');
       }
 
-      toast.success('Pesanan berhasil dibuat! Admin akan segera memproses.', { id: loadingToast });
+      toast.success('Pesanan berhasil dibuat!', { id: loadingToast });
+      
+      // Redirect to invoice page
+      router.push(`/invoice/${result.orderId}`);
 
     } catch (error: any) {
       console.error(error);
@@ -144,7 +138,7 @@ export default function ProductCheckoutPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* Product Banner & Info — Using real game image */}
+      {/* Product Banner & Info */}
       <div className="relative rounded-2xl overflow-hidden mb-8 shadow-xl border border-white/10">
         <div className="relative h-48 md:h-64 w-full">
           <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
@@ -179,7 +173,7 @@ export default function ProductCheckoutPage() {
           />
         </div>
 
-        {/* Right Column: Upload & Summary */}
+        {/* Right Column: Summary */}
         <div className="space-y-6">
           
           {/* Ulasan dan Rating Block */}
@@ -208,20 +202,6 @@ export default function ProductCheckoutPage() {
               <p className="text-xs text-white/50">Kamu bisa hubungi admin disini.</p>
             </div>
           </div>
-          {/* Show Payment Instructions when a method is selected */}
-          {selectedPayment && (
-            <>
-              <PaymentInstructions 
-                method={selectedPayment} 
-                totalAmount={selectedNominal?.price || 0} 
-              />
-              <PaymentProofUpload
-                onUpload={(file) => setPaymentProof(file)}
-                selectedPayment={selectedPayment}
-                totalAmount={selectedNominal?.price}
-              />
-            </>
-          )}
 
           {/* Sticky Summary */}
           <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-6 shadow-xl sticky top-24 backdrop-blur-sm">
@@ -244,6 +224,14 @@ export default function ProductCheckoutPage() {
                   {selectedPayment?.label || '-'}
                 </span>
               </div>
+              {accountData.nickname && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-white/50">Nickname</span>
+                  <span className="text-green-400 font-bold text-right">
+                    {accountData.nickname}
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="pt-4 border-t border-white/10 mb-6">
