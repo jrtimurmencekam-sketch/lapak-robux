@@ -6,9 +6,6 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
-const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID!;
-
 // Anti-Spam Rate Limiting
 interface RateLimitState {
   count: number;
@@ -70,7 +67,6 @@ export async function POST(request: NextRequest) {
       paymentMethodId,
       productSlug,
       nickname,
-      orderType,
     } = body;
 
     // 1. Save order to Supabase (full details, no proof yet)
@@ -100,50 +96,7 @@ export async function POST(request: NextRequest) {
 
     const orderId = orderData.id;
 
-    // 2. Build Telegram notification (text only, no proof)
-    let accountInfo = '';
-    let productIcon = '🎮';
-    let productLabel = 'Game';
-    const buyerWhatsapp = accountData?.whatsapp || '';
-
-    switch (orderType) {
-      case 'account':
-        productIcon = '👑';
-        productLabel = 'BELI AKUN';
-        accountInfo = `📱 *WA Pembeli:* ${buyerWhatsapp || JSON.stringify(accountData)}`;
-        break;
-      default:
-        productIcon = '🎮';
-        productLabel = 'Game';
-        accountInfo = `👤 *Data Akun:* ${JSON.stringify(accountData)}`;
-    }
-
-    const nickLine = nickname ? `\n🏷️ *Nickname:* ${nickname}` : '';
-    const waLine = buyerWhatsapp ? `\n📲 *WA Pembeli:* ${buyerWhatsapp}` : '';
-
-    const message = `🛒 *PESANAN BARU MASUK!*\n\n` +
-      `📋 *ID Pesanan:* \`${orderId}\`\n` +
-      `${productIcon} *${productLabel}:* ${gameTitle}\n` +
-      `${accountInfo}${nickLine}\n` +
-      `💎 *Nominal:* ${nominalName}\n` +
-      `💰 *Total:* Rp ${Number(totalAmount).toLocaleString('id-ID')}\n` +
-      `💳 *Pembayaran:* ${paymentMethod.toUpperCase()}${waLine}\n` +
-      `⏰ *Waktu:* ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}\n\n` +
-      `⏳ _Menunggu pembayaran..._`;
-
-    // 3. Send text notification to Telegram
-    await fetch(
-      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: message,
-          parse_mode: 'Markdown',
-        }),
-      }
-    );
+    // Notifikasi Telegram dikirim saat bukti bayar diupload (via /api/order/proof)
 
     return NextResponse.json({ 
       success: true, 
