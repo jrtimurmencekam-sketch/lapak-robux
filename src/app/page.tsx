@@ -5,6 +5,7 @@ import CategoryNav from "@/components/layout/CategoryNav";
 import PromoCarousel from "@/components/ui/PromoCarousel";
 import GameCard from "@/components/ui/GameCard";
 import GameCardSkeleton from "@/components/ui/GameCardSkeleton";
+import TestimonialCarousel from "@/components/ui/TestimonialCarousel";
 import { supabase } from '@/lib/supabase';
 import { motion, Variants } from 'framer-motion';
 
@@ -125,6 +126,8 @@ export default function Home() {
             </motion.div>
           )}
         </section>
+
+        <TestimonialCarousel />
       </div>
     </>
   );
