@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { Gem } from 'lucide-react';
 
 interface NominalSelectionProps {
   nominals: { id: string; name: string; price: number }[];
@@ -15,54 +16,57 @@ export default function NominalSelection({ nominals, onSelect }: NominalSelectio
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-    }).format(price);
+    return `Rp. ${price.toLocaleString('id-ID')}`;
   };
 
   return (
-    <div className="bg-accent/30 border border-white/10 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-      <div className="flex items-center gap-3 mb-6 relative z-10">
-        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">2</div>
-        <h2 className="text-xl font-bold text-white">Pilih Nominal</h2>
+    <div className="bg-surface border border-white/5 rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+      <div className="flex items-center gap-3 mb-5 relative z-10">
+        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">2</div>
+        <h2 className="text-lg font-bold text-white">Pilih Nominal</h2>
       </div>
 
+      <p className="text-xs text-white/40 mb-4 flex items-center gap-1.5">
+        <span className="text-primary">✨</span> Top Up Instant
+      </p>
+
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 relative z-10">
-        {nominals.map((nom) => {
-          const isOutOfStock = nom.price < 70000;
-          return (
-            <button
-              key={nom.id}
-              onClick={() => !isOutOfStock && handleSelect(nom.id, nom.price)}
-              disabled={isOutOfStock}
-              className={`flex flex-col items-center justify-center p-4 rounded-xl border transition-all duration-300 relative overflow-hidden ${
-                isOutOfStock 
-                  ? 'bg-white/5 border-white/5 opacity-50 cursor-not-allowed'
-                  : selectedId === nom.id
-                    ? 'bg-primary/20 border-primary ring-1 ring-primary'
-                    : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/30 cursor-pointer'
-              }`}
-            >
-              {!isOutOfStock && (
-                <div className="absolute top-0 right-0 bg-red-600 text-white text-[8px] sm:text-[10px] font-bold px-2 py-0.5 rounded-bl-lg rounded-tr-xl z-20">
-                  -30%
-                </div>
-              )}
-              <span className={`text-sm font-semibold mb-1 ${
-                isOutOfStock ? 'text-white/40 line-through' : selectedId === nom.id ? 'text-primary' : 'text-white'
-              } relative z-10`}>
-                {nom.name}
-              </span>
+        {nominals.map((nom) => (
+          <button
+            key={nom.id}
+            onClick={() => handleSelect(nom.id, nom.price)}
+            className={`flex flex-col items-start p-4 rounded-xl border transition-all duration-300 relative overflow-hidden ${
+              selectedId === nom.id
+                ? 'bg-primary/10 border-primary ring-2 ring-primary/40 shadow-[0_0_15px_rgba(255,215,0,0.1)]'
+                : 'bg-accent/60 border-white/5 hover:bg-accent hover:border-white/15 cursor-pointer'
+            }`}
+          >
+            {/* Nominal Name */}
+            <span className={`text-sm font-bold mb-1.5 ${
+              selectedId === nom.id ? 'text-primary' : 'text-white'
+            }`}>
+              {nom.name}
+            </span>
+
+            {/* Price with icon */}
+            <div className="flex items-center gap-1.5">
+              <Gem className={`w-3.5 h-3.5 ${
+                selectedId === nom.id ? 'text-primary/80' : 'text-secondary/70'
+              }`} />
               <span className={`text-xs font-bold ${
-                isOutOfStock ? 'text-red-400' : selectedId === nom.id ? 'text-primary/90' : 'text-white/60'
-              } relative z-10`}>
-                {isOutOfStock ? 'HABIS' : formatPrice(nom.price)}
+                selectedId === nom.id ? 'text-primary/90' : 'text-secondary'
+              }`}>
+                {formatPrice(nom.price)}
               </span>
-            </button>
-          );
-        })}
+            </div>
+
+            {/* INSTAN Badge */}
+            <div className="mt-2.5 flex items-center gap-1 px-2 py-0.5 bg-secondary/10 rounded text-[9px] font-bold text-secondary/80 tracking-wide">
+              <Gem className="w-2.5 h-2.5" />
+              RESPONSE INSTAN
+            </div>
+          </button>
+        ))}
       </div>
     </div>
   );

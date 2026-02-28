@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Star, MessageCircle, ShieldCheck } from 'lucide-react';
 
 interface Testimonial {
@@ -109,64 +109,40 @@ function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
 }
 
 export default function TestimonialCarousel() {
-  const scrollRef1 = useRef<HTMLDivElement>(null);
-  const scrollRef2 = useRef<HTMLDivElement>(null);
-  const [isPaused1, setIsPaused1] = useState(false);
-  const [isPaused2, setIsPaused2] = useState(false);
-
   const row1 = testimonials.slice(0, 25);
   const row2 = testimonials.slice(25);
-
-  // Auto-scroll row 1 (left to right)
-  useEffect(() => {
-    const el = scrollRef1.current;
-    if (!el) return;
-    let animationId: number;
-    const speed = 0.5;
-
-    const scroll = () => {
-      if (!isPaused1 && el) {
-        el.scrollLeft += speed;
-        if (el.scrollLeft >= el.scrollWidth / 2) {
-          el.scrollLeft = 0;
-        }
-      }
-      animationId = requestAnimationFrame(scroll);
-    };
-
-    animationId = requestAnimationFrame(scroll);
-    return () => cancelAnimationFrame(animationId);
-  }, [isPaused1]);
-
-  // Auto-scroll row 2 (right to left)
-  useEffect(() => {
-    const el = scrollRef2.current;
-    if (!el) return;
-    let animationId: number;
-    const speed = 0.5;
-
-    // Start from middle
-    el.scrollLeft = el.scrollWidth / 2;
-
-    const scroll = () => {
-      if (!isPaused2 && el) {
-        el.scrollLeft -= speed;
-        if (el.scrollLeft <= 0) {
-          el.scrollLeft = el.scrollWidth / 2;
-        }
-      }
-      animationId = requestAnimationFrame(scroll);
-    };
-
-    animationId = requestAnimationFrame(scroll);
-    return () => cancelAnimationFrame(animationId);
-  }, [isPaused2]);
 
   const totalReviews = testimonials.length;
   const avgRating = (testimonials.reduce((sum, t) => sum + t.rating, 0) / totalReviews).toFixed(1);
 
+  // CSS animation duration based on item count
+  const row1Duration = row1.length * 4; // ~4s per card
+  const row2Duration = row2.length * 4;
+
   return (
     <section className="mb-12">
+      {/* Inline CSS keyframes for the marquee */}
+      <style>{`
+        @keyframes marquee-left {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        @keyframes marquee-right {
+          0% { transform: translateX(-50%); }
+          100% { transform: translateX(0); }
+        }
+        .marquee-row-1 {
+          animation: marquee-left ${row1Duration}s linear infinite;
+        }
+        .marquee-row-2 {
+          animation: marquee-right ${row2Duration}s linear infinite;
+        }
+        .marquee-row-1:hover,
+        .marquee-row-2:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-3">
         <div>
@@ -186,34 +162,22 @@ export default function TestimonialCarousel() {
         </div>
       </div>
 
-      {/* Row 1 - scrolls left */}
-      <div
-        ref={scrollRef1}
-        className="flex gap-4 overflow-x-hidden mb-4"
-        onMouseEnter={() => setIsPaused1(true)}
-        onMouseLeave={() => setIsPaused1(false)}
-        onTouchStart={() => setIsPaused1(true)}
-        onTouchEnd={() => setIsPaused1(false)}
-      >
-        {/* Duplicate for infinite scroll effect */}
-        {[...row1, ...row1].map((t, i) => (
-          <TestimonialCard key={`r1-${i}`} testimonial={t} />
-        ))}
+      {/* Row 1 - scrolls left (CSS animation) */}
+      <div className="overflow-hidden mb-4">
+        <div className="flex gap-4 marquee-row-1" style={{ width: 'max-content' }}>
+          {[...row1, ...row1].map((t, i) => (
+            <TestimonialCard key={`r1-${i}`} testimonial={t} />
+          ))}
+        </div>
       </div>
 
-      {/* Row 2 - scrolls right */}
-      <div
-        ref={scrollRef2}
-        className="flex gap-4 overflow-x-hidden"
-        onMouseEnter={() => setIsPaused2(true)}
-        onMouseLeave={() => setIsPaused2(false)}
-        onTouchStart={() => setIsPaused2(true)}
-        onTouchEnd={() => setIsPaused2(false)}
-      >
-        {/* Duplicate for infinite scroll effect */}
-        {[...row2, ...row2].map((t, i) => (
-          <TestimonialCard key={`r2-${i}`} testimonial={t} />
-        ))}
+      {/* Row 2 - scrolls right (CSS animation) */}
+      <div className="overflow-hidden">
+        <div className="flex gap-4 marquee-row-2" style={{ width: 'max-content' }}>
+          {[...row2, ...row2].map((t, i) => (
+            <TestimonialCard key={`r2-${i}`} testimonial={t} />
+          ))}
+        </div>
       </div>
     </section>
   );

@@ -7,7 +7,7 @@ import NominalSelection from '@/components/ui/NominalSelection';
 import PaymentSelection from '@/components/ui/PaymentSelection';
 import { supabase } from '@/lib/supabase';
 import toast from 'react-hot-toast';
-import { Star, Headphones } from 'lucide-react';
+import { Star, Headphones, Zap, MessageCircle, ShieldCheck } from 'lucide-react';
 
 interface ProductData {
   id: string;
@@ -30,6 +30,7 @@ export default function ProductCheckoutPage() {
   const [selectedNominal, setSelectedNominal] = useState<{ id: string, price: number } | null>(null);
   const [selectedPayment, setSelectedPayment] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'transaksi' | 'keterangan'>('transaksi');
 
   // Fetch product from Supabase
   useEffect(() => {
@@ -137,41 +138,90 @@ export default function ProductCheckoutPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
-      {/* Product Banner & Info */}
-      <div className="relative rounded-2xl overflow-hidden mb-8 shadow-xl border border-white/10">
-        <div className="relative h-48 md:h-64 w-full">
-          <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        </div>
-        <div className="absolute bottom-6 left-6 flex items-end gap-4">
-          <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl overflow-hidden border-2 border-primary/30 shadow-xl shrink-0 bg-background/80 backdrop-blur-sm">
+    <div className="max-w-6xl mx-auto">
+      {/* ═══ Full-bleed Banner ═══ */}
+      <div className="relative w-full h-56 sm:h-64 md:h-72 overflow-hidden">
+        <img src={product.image_url} alt={product.title} className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/20" />
+      </div>
+
+      {/* ═══ Product Info Card ═══ */}
+      <div className="container mx-auto px-4 -mt-16 relative z-10">
+        <div className="flex items-end gap-4 mb-4">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden border-2 border-primary/30 shadow-2xl shrink-0 bg-background">
             <img src={product.image_url} alt="Logo" className="w-full h-full object-cover" />
           </div>
-          <div className="mb-1">
-            <h1 className="text-2xl md:text-3xl font-black text-white drop-shadow-lg tracking-tight">{product.title}</h1>
-            <p className="text-white/60 text-sm font-medium drop-shadow mt-1">{product.description}</p>
+          <div className="mb-1 min-w-0">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-white tracking-tight uppercase">{product.title}</h1>
+            <p className="text-white/50 text-sm font-medium mt-0.5">{product.description || 'Developer'}</p>
           </div>
+        </div>
+
+        {/* Trust Badges */}
+        <div className="flex flex-wrap items-center gap-4 sm:gap-6 mb-6">
+          <div className="flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5 text-primary" />
+            <span className="text-xs font-semibold text-white/60">Proses Cepat</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <MessageCircle className="w-3.5 h-3.5 text-secondary" />
+            <span className="text-xs font-semibold text-white/60">Layanan Chat 24/7</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-green-400" />
+            <span className="text-xs font-semibold text-white/60">Pembayaran Aman!</span>
+          </div>
+        </div>
+
+        {/* ═══ Tab Navigation ═══ */}
+        <div className="flex border-b border-white/10 mb-6">
+          <button
+            onClick={() => setActiveTab('transaksi')}
+            className={`flex-1 sm:flex-none px-6 py-3 text-sm font-bold transition-all ${
+              activeTab === 'transaksi'
+                ? 'text-primary border-b-2 border-primary bg-primary/5'
+                : 'text-white/40 hover:text-white/60'
+            }`}
+          >
+            Transaksi
+          </button>
+          <button
+            onClick={() => setActiveTab('keterangan')}
+            className={`flex-1 sm:flex-none px-6 py-3 text-sm font-bold transition-all ${
+              activeTab === 'keterangan'
+                ? 'text-primary border-b-2 border-primary bg-primary/5'
+                : 'text-white/40 hover:text-white/60'
+            }`}
+          >
+            Keterangan
+          </button>
         </div>
       </div>
 
-      {/* Main Checkout Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        {/* Left Column: Form Fields */}
-        <div className="lg:col-span-2 space-y-6">
-          <AccountInput 
-            gameIdType={product.game_id_type} 
-            onChange={(data) => setAccountData((prev: any) => ({ ...prev, ...data }))} 
-          />
-          <NominalSelection 
-            nominals={product.nominals}
-            onSelect={(id, price) => setSelectedNominal({ id, price })}
-          />
-          <PaymentSelection 
-            onSelect={(method) => setSelectedPayment(method)}
-          />
-        </div>
+      {/* ═══ Tab Content ═══ */}
+      <div className="container mx-auto px-4 pb-8">
+        {activeTab === 'keterangan' ? (
+          <div className="bg-surface border border-white/5 rounded-2xl p-6 max-w-3xl">
+            <h3 className="text-lg font-bold text-white mb-3">Tentang {product.title}</h3>
+            <p className="text-white/60 text-sm leading-relaxed">{product.description || 'Informasi produk belum tersedia.'}</p>
+          </div>
+        ) : (
+          /* ═══ Transaksi Tab — Main Checkout Grid ═══ */
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column: Form Fields */}
+            <div className="lg:col-span-2 space-y-5">
+              <AccountInput 
+                gameIdType={product.game_id_type} 
+                onChange={(data) => setAccountData((prev: any) => ({ ...prev, ...data }))} 
+              />
+              <NominalSelection 
+                nominals={product.nominals}
+                onSelect={(id, price) => setSelectedNominal({ id, price })}
+              />
+              <PaymentSelection 
+                onSelect={(method) => setSelectedPayment(method)}
+              />
+            </div>
 
         {/* Right Column: Summary */}
         <div className="space-y-6">
@@ -260,7 +310,34 @@ export default function ProductCheckoutPage() {
           </div>
         </div>
 
+          </div>
+        )}
       </div>
+
+      {/* Fixed Bottom CTA — Mobile */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-background/95 backdrop-blur-xl border-t border-white/10 px-4 py-3">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-xs text-white/50">Total Pembayaran</p>
+            <p className="text-lg font-black text-primary">
+              {selectedNominal ? `Rp ${selectedNominal.price.toLocaleString('id-ID')}` : 'Rp 0'}
+            </p>
+          </div>
+          <button
+            onClick={handleSubmit}
+            disabled={isLoading || !selectedNominal || !selectedPayment}
+            className={`px-6 py-3 rounded-xl font-bold text-sm transition-all ${
+              isLoading || !selectedNominal || !selectedPayment
+                ? 'bg-white/10 text-white/40 cursor-not-allowed'
+                : 'bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 shadow-lg shadow-primary/20'
+            }`}
+          >
+            {isLoading ? 'Memproses...' : 'Pesan Sekarang! 🚀'}
+          </button>
+        </div>
+      </div>
+      {/* Bottom spacer for mobile fixed CTA */}
+      <div className="h-20 lg:hidden" />
     </div>
   );
 }

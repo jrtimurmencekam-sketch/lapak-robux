@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { QrCode, Building2 } from 'lucide-react';
+import { QrCode, Building2, ChevronDown, ChevronUp, Award } from 'lucide-react';
 
 interface PaymentMethod {
   id: string;
@@ -20,6 +20,7 @@ export default function PaymentSelection({ onSelect }: PaymentSelectionProps) {
   const [methods, setMethods] = useState<PaymentMethod[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedGroup, setExpandedGroup] = useState<string | null>('qris');
 
   useEffect(() => {
     const fetchMethods = async () => {
@@ -42,11 +43,18 @@ export default function PaymentSelection({ onSelect }: PaymentSelectionProps) {
     onSelect(method);
   };
 
+  const qrisMethods = methods.filter(m => m.type === 'qris');
+  const transferMethods = methods.filter(m => m.type === 'transfer');
+
+  const toggleGroup = (group: string) => {
+    setExpandedGroup(expandedGroup === group ? null : group);
+  };
+
   return (
-    <div className="bg-accent/30 border border-white/10 rounded-2xl p-6 shadow-xl relative overflow-hidden">
-      <div className="flex items-center gap-3 mb-6 relative z-10">
-        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">3</div>
-        <h2 className="text-xl font-bold text-white">Pilih Pembayaran</h2>
+    <div className="bg-surface border border-white/5 rounded-2xl p-5 sm:p-6 shadow-xl relative overflow-hidden">
+      <div className="flex items-center gap-3 mb-5 relative z-10">
+        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">3</div>
+        <h2 className="text-lg font-bold text-white">Pilih Pembayaran</h2>
       </div>
 
       {isLoading ? (
@@ -59,32 +67,100 @@ export default function PaymentSelection({ onSelect }: PaymentSelectionProps) {
           Belum ada metode pembayaran yang tersedia. Hubungi admin.
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
-          {methods.map((method) => (
-            <button
-              key={method.id}
-              onClick={() => handleSelect(method)}
-              className={`flex flex-col items-start p-5 rounded-2xl border transition-all duration-300 ${
-                selectedId === method.id
-                  ? 'bg-primary/20 border-primary ring-2 ring-primary/50 shadow-[0_0_15px_rgba(255,215,0,0.15)]'
-                  : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/30'
-              }`}
-            >
-              <span className="text-xs text-white/50 mb-2 font-medium tracking-wider uppercase">
-                {method.type === 'qris' ? 'E-Wallet / M-Banking' : 'Bank Transfer'}
-              </span>
-              <div className="flex items-center gap-3 w-full">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-                  method.type === 'qris' ? 'bg-purple-500/20 text-purple-400' : 'bg-blue-500/20 text-blue-400'
-                }`}>
-                  {method.type === 'qris' ? <QrCode className="w-5 h-5" /> : <Building2 className="w-5 h-5" />}
+        <div className="space-y-3 relative z-10">
+          {/* QRIS Group */}
+          {qrisMethods.length > 0 && (
+            <div className="border border-white/5 rounded-xl overflow-hidden">
+              <button
+                onClick={() => toggleGroup('qris')}
+                className="w-full flex items-center justify-between p-4 bg-accent/60 hover:bg-accent transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-purple-500/20 flex items-center justify-center">
+                    <QrCode className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <span className="text-sm font-bold text-white">QRIS (All Payment)</span>
                 </div>
-                <span className={`text-base font-bold text-left ${selectedId === method.id ? 'text-primary' : 'text-white'}`}>
-                  {method.label}
-                </span>
-              </div>
-            </button>
-          ))}
+                <div className="flex items-center gap-2">
+                  <span className="bg-primary/20 text-primary text-[9px] font-extrabold px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Award className="w-2.5 h-2.5" />
+                    BEST PRICE
+                  </span>
+                  {expandedGroup === 'qris' ? (
+                    <ChevronUp className="w-4 h-4 text-white/40" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-white/40" />
+                  )}
+                </div>
+              </button>
+              {expandedGroup === 'qris' && (
+                <div className="p-3 space-y-2">
+                  {qrisMethods.map((method) => (
+                    <button
+                      key={method.id}
+                      onClick={() => handleSelect(method)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 ${
+                        selectedId === method.id
+                          ? 'bg-primary/10 border-primary ring-1 ring-primary/40'
+                          : 'bg-accent/40 border-white/5 hover:bg-accent hover:border-white/10'
+                      }`}
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-purple-500/15 flex items-center justify-center shrink-0">
+                        <QrCode className="w-4 h-4 text-purple-400" />
+                      </div>
+                      <span className={`text-sm font-bold ${selectedId === method.id ? 'text-primary' : 'text-white'}`}>
+                        {method.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Bank Transfer Group */}
+          {transferMethods.length > 0 && (
+            <div className="border border-white/5 rounded-xl overflow-hidden">
+              <button
+                onClick={() => toggleGroup('transfer')}
+                className="w-full flex items-center justify-between p-4 bg-accent/60 hover:bg-accent transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center">
+                    <Building2 className="w-4 h-4 text-blue-400" />
+                  </div>
+                  <span className="text-sm font-bold text-white">Bank Transfer & E-Wallet</span>
+                </div>
+                {expandedGroup === 'transfer' ? (
+                  <ChevronUp className="w-4 h-4 text-white/40" />
+                ) : (
+                  <ChevronDown className="w-4 h-4 text-white/40" />
+                )}
+              </button>
+              {expandedGroup === 'transfer' && (
+                <div className="p-3 space-y-2">
+                  {transferMethods.map((method) => (
+                    <button
+                      key={method.id}
+                      onClick={() => handleSelect(method)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 ${
+                        selectedId === method.id
+                          ? 'bg-primary/10 border-primary ring-1 ring-primary/40'
+                          : 'bg-accent/40 border-white/5 hover:bg-accent hover:border-white/10'
+                      }`}
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-blue-500/15 flex items-center justify-center shrink-0">
+                        <Building2 className="w-4 h-4 text-blue-400" />
+                      </div>
+                      <span className={`text-sm font-bold ${selectedId === method.id ? 'text-primary' : 'text-white'}`}>
+                        {method.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
