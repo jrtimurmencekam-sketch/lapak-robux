@@ -28,9 +28,9 @@ const validationRules: Record<string, Record<string, ValidationRule>> = {
     zoneId: {
       pattern: /^\d+$/,
       minLength: 4,
-      maxLength: 4,
-      errorMessage: 'Zone ID harus 4 digit angka',
-      hint: 'Contoh: 2505 (angka dalam tanda kurung di profil)',
+      maxLength: 6,
+      errorMessage: 'Zone ID harus 4-6 digit angka',
+      hint: 'Contoh: 2505 atau 25051 (angka dalam tanda kurung di profil)',
     },
   },
   'ID & Server': {
@@ -44,9 +44,9 @@ const validationRules: Record<string, Record<string, ValidationRule>> = {
     zoneId: {
       pattern: /^\d+$/,
       minLength: 4,
-      maxLength: 4,
-      errorMessage: 'Zone ID harus 4 digit angka',
-      hint: 'Contoh: 2505',
+      maxLength: 6,
+      errorMessage: 'Zone ID harus 4-6 digit angka',
+      hint: 'Contoh: 2505 atau 25051',
     },
   },
   ff: {
