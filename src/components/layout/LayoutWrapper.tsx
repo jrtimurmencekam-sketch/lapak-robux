@@ -12,14 +12,15 @@ interface LayoutWrapperProps {
 export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   const pathname = usePathname();
   const isAdminPage = pathname?.startsWith('/kuru');
+  const isHideLayout = isAdminPage || pathname === '/cek';
 
   return (
     <>
-      {!isAdminPage && <Header />}
+      {!isHideLayout && <Header />}
       <main className="flex-1 w-full flex flex-col">
         {children}
       </main>
-      {!isAdminPage && (
+      {!isHideLayout && (
         <>
           <Footer />
           <FloatingWhatsApp />
