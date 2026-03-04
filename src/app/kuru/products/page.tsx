@@ -20,7 +20,8 @@ export default function AdminProductsPage() {
     image_url: '',
     game_id_type: 'ID & Server',
     price: 0,
-    is_active: true
+    is_active: true,
+    nominals: [] as { id: string, name: string, price: number }[]
   });
 
   useEffect(() => {
@@ -48,16 +49,31 @@ export default function AdminProductsPage() {
     }
   };
 
+  const generateSlug = (title: string) => {
+    return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+  };
+
   const handleOpenModal = (prod?: any) => {
     if (prod) {
       setEditingId(prod.id);
+      
+      let parsedNominals = [];
+      try {
+        if (prod.nominals) {
+           parsedNominals = typeof prod.nominals === 'string' ? JSON.parse(prod.nominals) : prod.nominals;
+        }
+      } catch (e) {
+        console.error("Failed to parse nominals", e);
+      }
+
       setFormData({
         title: prod.title,
         category_id: prod.category_id,
         image_url: prod.image_url || '',
         game_id_type: prod.game_id_type,
         price: prod.price,
-        is_active: prod.is_active
+        is_active: prod.is_active,
+        nominals: parsedNominals
       });
     } else {
       setEditingId(null);
@@ -67,11 +83,30 @@ export default function AdminProductsPage() {
         image_url: '',
         game_id_type: 'ID & Server',
         price: 0,
-        is_active: true
+        is_active: true,
+        nominals: []
       });
     }
     setImageFile(null); // Reset file input when opening modal
     setIsModalOpen(true);
+  };
+
+  const handleAddNominal = () => {
+    setFormData({
+      ...formData,
+      nominals: [...formData.nominals, { id: `pkg-${Date.now()}`, name: '', price: 0 }]
+    });
+  };
+
+  const handleUpdateNominal = (index: number, field: string, value: string | number) => {
+    const newNominals = [...formData.nominals];
+    newNominals[index] = { ...newNominals[index], [field]: value };
+    setFormData({ ...formData, nominals: newNominals });
+  };
+
+  const handleRemoveNominal = (index: number) => {
+    const newNominals = formData.nominals.filter((_, i) => i !== index);
+    setFormData({ ...formData, nominals: newNominals });
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -104,11 +139,13 @@ export default function AdminProductsPage() {
 
       const payload = {
         title: formData.title,
+        slug: generateSlug(formData.title),
         category_id: formData.category_id,
         image_url: finalImageUrl,
         game_id_type: formData.game_id_type,
         price: formData.price,
-        is_active: formData.is_active
+        is_active: formData.is_active,
+        nominals: JSON.stringify(formData.nominals)
       };
 
       if (editingId) {
@@ -233,6 +270,10 @@ export default function AdminProductsPage() {
                   <p className="text-sm text-white/50 flex justify-between">
                     <span>Form ID</span>
                     <span className="text-white bg-white/10 px-1.5 rounded">{prod.game_id_type}</span>
+                  </p>
+                  <p className="text-sm text-white/50 flex justify-between">
+                    <span>Daftar Paket</span>
+                    <span className="text-primary font-bold">{prod.nominals ? (typeof prod.nominals === 'string' ? JSON.parse(prod.nominals).length : prod.nominals.length) : 0} Paket</span>
                   </p>
                 </div>
               </div>
@@ -370,6 +411,69 @@ export default function AdminProductsPage() {
                     )}
                   </div>
                 </div>
+              </div>
+
+              {/* NOMINALS SECTION */}
+              <div className="pt-4 border-t border-white/10">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <h3 className="text-sm font-bold text-white uppercase tracking-wider">Daftar Paket / Nominal</h3>
+                    <p className="text-xs text-white/50 mt-0.5">Setup produk top up yang akan ditampilkan ke user.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleAddNominal}
+                    className="flex items-center gap-1.5 bg-primary/20 text-primary hover:bg-primary hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
+                  >
+                    <Plus className="w-4 h-4" /> Tambah Paket
+                  </button>
+                </div>
+
+                {formData.nominals.length === 0 ? (
+                  <div className="text-center py-6 bg-white/5 border border-white/10 rounded-xl">
+                    <p className="text-sm text-white/40">Belum ada paket top up untuk produk ini.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                    {formData.nominals.map((nom, index) => (
+                      <div key={index} className="flex flex-col sm:flex-row gap-3 bg-white/5 p-4 rounded-xl border border-white/10 relative group">
+                        <div className="flex-1">
+                          <label className="block text-[10px] font-bold text-white/40 uppercase mb-1">ID Unik (Otomatis/Bebas)</label>
+                          <input 
+                            type="text" required value={nom.id}
+                            onChange={(e) => handleUpdateNominal(index, 'id', e.target.value)}
+                            className="w-full bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-white text-sm focus:border-primary focus:outline-none"
+                            placeholder="Contoh: pkg-1"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="block text-[10px] font-bold text-white/40 uppercase mb-1">Nama Paket</label>
+                          <input 
+                            type="text" required value={nom.name}
+                            onChange={(e) => handleUpdateNominal(index, 'name', e.target.value)}
+                            className="w-full bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-white text-sm focus:border-primary focus:outline-none"
+                            placeholder="Contoh: 5 Diamonds"
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <label className="block text-[10px] font-bold text-white/40 uppercase mb-1">Harga (Rp)</label>
+                          <input 
+                            type="number" required min="0" value={nom.price}
+                            onChange={(e) => handleUpdateNominal(index, 'price', Number(e.target.value))}
+                            className="w-full bg-[#0a0a0a] border border-white/5 rounded-lg px-3 py-2 text-white text-sm focus:border-primary focus:outline-none font-mono"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveNominal(index)}
+                          className="shrink-0 self-end sm:self-center p-2 mt-4 sm:mt-0 text-red-400 hover:bg-red-400/20 bg-red-400/10 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex items-center gap-3 pt-2 bg-white/5 p-4 rounded-xl border border-white/10">
