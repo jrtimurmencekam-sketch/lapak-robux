@@ -12,7 +12,7 @@ interface LayoutWrapperProps {
 export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   const pathname = usePathname();
   const isAdminPage = pathname?.startsWith('/kuru');
-  const isHideLayout = isAdminPage || pathname === '/cek';
+  const isHideLayout = isAdminPage || pathname === '/cek' || pathname === '/aktivasi';
 
   return (
     <>

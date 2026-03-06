@@ -2,17 +2,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, Loader2, UserCheck } from 'lucide-react';
 
-// Game configuration derived from AccountInput logic
+// Only Roblox allowed for this page
 const GAMES = [
-  { id: 'ml', name: 'Mobile Legends', type: 'ml' },
-  { id: 'ff', name: 'Free Fire', type: 'ff' },
-  { id: 'pubg', name: 'PUBG Mobile', type: 'pubg' },
-  { id: 'genshin', name: 'Genshin Impact', type: 'genshin' },
   { id: 'roblox', name: 'Roblox', type: 'roblox' },
 ];
 
 export default function CekTrackingPage() {
-  const [game, setGame] = useState('ml');
+  const [game, setGame] = useState('roblox');
   const [fields, setFields] = useState<Record<string, string>>({});
   const [order, setOrder] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -186,25 +182,14 @@ export default function CekTrackingPage() {
       <div className={`bg-[#1a1b1e] border border-white/10 rounded-3xl p-6 md:p-8 shadow-2xl mb-8 transition-all duration-300 ${isErrorShake ? 'animate-shake' : ''}`}>
         <form onSubmit={handleSearch} className="flex flex-col gap-6">
           <div>
-            <label className="block text-sm font-bold text-white/50 uppercase tracking-wider mb-3">Langkah 1: Pilih Game & Masukkan ID</label>
+            <label className="block text-sm font-bold text-white/50 uppercase tracking-wider mb-3">Langkah 1: Masukkan Username Roblox</label>
             <div className="space-y-4">
-              <select
-                value={game}
-                onChange={(e) => {
-                  setGame(e.target.value);
-                  setFields({});
-                  setNickname(null);
-                  setOrder(null);
-                  setError('');
-                }}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors appearance-none cursor-pointer"
-              >
-                {GAMES.map((g) => (
-                  <option key={g.id} value={g.id} className="bg-[#1a1b1e] text-white">
-                    {g.name}
-                  </option>
-                ))}
-              </select>
+              <div className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white font-bold opacity-70 flex items-center gap-2 cursor-not-allowed">
+                <div className="w-5 h-5 rounded-full bg-[#1a1b1e] border border-white/20 flex items-center justify-center shrink-0">
+                  <div className="w-2.5 h-2.5 bg-primary rounded-sm rotate-45"></div>
+                </div>
+                Roblox
+              </div>
               {renderInputs()}
             </div>
           </div>
