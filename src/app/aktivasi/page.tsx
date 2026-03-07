@@ -63,7 +63,7 @@ export default function CekTrackingPage() {
   }, [fields.userId, fields.zoneId, game]);
 
   // Static WA number for this specific page
-  const [waNumber, setWaNumber] = useState('6285135853962');
+  const [waNumber, setWaNumber] = useState('6283170033598');
 
   const [showModal, setShowModal] = useState(false);
   const [isErrorShake, setIsErrorShake] = useState(false);
