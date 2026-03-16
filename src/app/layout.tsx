@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 
 import ToasterProvider from "@/components/ui/ToasterProvider";
 import LayoutWrapper from "@/components/layout/LayoutWrapper";
+import Script from "next/script";
 
 export const metadata: Metadata = {
   title: {
@@ -77,6 +78,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-18020957380"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+          
+            gtag('config', 'AW-18020957380');
+          `}
+        </Script>
         <ToasterProvider />
         <LayoutWrapper>
           {children}
