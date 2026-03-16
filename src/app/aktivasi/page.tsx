@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { Search, Loader2, UserCheck } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 // Only Roblox allowed for this page
 const GAMES = [
@@ -62,8 +63,20 @@ export default function CekTrackingPage() {
     };
   }, [fields.userId, fields.zoneId, game]);
 
-  // Static WA number for this specific page
+  // Fetch WA from site_settings on mount
   const [waNumber, setWaNumber] = useState('6283170033598');
+
+  useEffect(() => {
+    async function fetchWA() {
+      const { data } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'whatsapp_number_aktivasi')
+        .single();
+      if (data?.value) setWaNumber(data.value);
+    }
+    fetchWA();
+  }, []);
 
   const [showModal, setShowModal] = useState(false);
   const [isErrorShake, setIsErrorShake] = useState(false);

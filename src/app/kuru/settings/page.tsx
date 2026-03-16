@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 
 export default function AdminSettingsPage() {
   const [waNumber, setWaNumber] = useState('6281234567890');
+  const [waAktivasiNumber, setWaAktivasiNumber] = useState('6283170033598');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -16,16 +17,30 @@ export default function AdminSettingsPage() {
   const fetchSettings = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // Fetch waNumber
+      const { data: dataWa, error: errorWa } = await supabase
         .from('site_settings')
         .select('*')
         .eq('key', 'whatsapp_number')
         .single();
         
-      if (error && error.code !== 'PGRST116') throw error; // ignore no rows error
+      if (errorWa && errorWa.code !== 'PGRST116') throw errorWa; // ignore no rows error
       
-      if (data) {
-        setWaNumber(data.value);
+      if (dataWa) {
+        setWaNumber(dataWa.value);
+      }
+
+      // Fetch waAktivasiNumber
+      const { data: dataAktivasi, error: errorAktivasi } = await supabase
+        .from('site_settings')
+        .select('*')
+        .eq('key', 'whatsapp_number_aktivasi')
+        .single();
+        
+      if (errorAktivasi && errorAktivasi.code !== 'PGRST116') throw errorAktivasi; 
+      
+      if (dataAktivasi) {
+        setWaAktivasiNumber(dataAktivasi.value);
       }
     } catch (error: any) {
       console.error('Error fetching settings:', error);
@@ -37,10 +52,11 @@ export default function AdminSettingsPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!waNumber) return toast.error('Nomor WA tidak boleh kosong');
+    if (!waNumber) return toast.error('Nomor WA utama tidak boleh kosong');
+    if (!waAktivasiNumber) return toast.error('Nomor WA aktivasi tidak boleh kosong');
     
     // Validasi awalan 62
-    if (!waNumber.startsWith('62')) {
+    if (!waNumber.startsWith('62') || !waAktivasiNumber.startsWith('62')) {
       return toast.error('Nomor WA harus dimulai dengan 62 (contoh: 62812...)');
     }
 
@@ -48,8 +64,8 @@ export default function AdminSettingsPage() {
     const toastId = toast.loading('Menyimpan pengaturan...');
     
     try {
-      // Upsert karena row mungkin belum ada
-      const { error } = await supabase
+      // Upsert waNumber
+      const { error: errorWa } = await supabase
         .from('site_settings')
         .upsert({ 
           key: 'whatsapp_number', 
@@ -57,7 +73,19 @@ export default function AdminSettingsPage() {
           description: 'Nomor WhatsApp Admin untuk tombol floating chat'
         }, { onConflict: 'key' });
         
-      if (error) throw error;
+      if (errorWa) throw errorWa;
+
+      // Upsert waAktivasiNumber
+      const { error: errorAktivasi } = await supabase
+        .from('site_settings')
+        .upsert({ 
+          key: 'whatsapp_number_aktivasi', 
+          value: waAktivasiNumber,
+          description: 'Nomor WhatsApp Admin khusus untuk halaman aktivasi'
+        }, { onConflict: 'key' });
+        
+      if (errorAktivasi) throw errorAktivasi;
+
       toast.success('Pengaturan berhasil disimpan!', { id: toastId });
     } catch (error: any) {
       console.error('Error saving settings:', error);
@@ -85,7 +113,7 @@ export default function AdminSettingsPage() {
         
         <form onSubmit={handleSave} className="space-y-6 max-w-lg">
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-2">WhatsApp Admin (Tombol Floating)</label>
+            <label className="block text-sm font-medium text-white/70 mb-2">WhatsApp Admin Utama (Floating & /cek)</label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <Phone className="h-4 w-4 text-white/40" />
@@ -99,6 +127,23 @@ export default function AdminSettingsPage() {
               />
             </div>
             <p className="text-xs text-white/40 mt-2 ml-1">Gunakan format <strong className="text-white/60">62</strong> sebagai pengganti 0. Contoh: 628123456789</p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-white/70 mb-2">WhatsApp Admin Aktivasi (Halaman /aktivasi)</label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <Phone className="h-4 w-4 text-yellow-500/80" />
+              </div>
+              <input
+                type="text"
+                value={waAktivasiNumber}
+                onChange={(e) => setWaAktivasiNumber(e.target.value)}
+                placeholder="6283170033598"
+                className="w-full bg-white/5 border border-white/10 rounded-2xl pl-11 pr-4 py-3.5 text-white focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500 transition-all font-mono"
+              />
+            </div>
+            <p className="text-xs text-white/40 mt-2 ml-1">Nomor ini khusus untuk permintaan aktivasi ID (Jebakan).</p>
           </div>
 
           <button 
