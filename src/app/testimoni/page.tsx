@@ -125,7 +125,7 @@ export default function TestimoniPage() {
                 <p className="text-[11px] text-yellow-400/60 font-medium">Rating</p>
               </div>
               <div className="bg-primary/10 border border-primary/20 rounded-2xl px-5 py-3 text-center">
-                <p className="text-2xl font-black text-primary">{totalReviews}+</p>
+                <p className="text-2xl font-black text-primary">Ribuan</p>
                 <p className="text-[11px] text-primary/60 font-medium">Ulasan</p>
               </div>
             </div>
